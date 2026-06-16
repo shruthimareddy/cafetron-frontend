@@ -1,0 +1,18 @@
+<div class="qr-scanner">
+
+  <button (click)="startScanner()" [disabled]="scanning">
+    {{ scanning ? 'Scanning...' : 'Scan QR Code' }}
+  </button>
+
+  <button (click)="stopCamera()" *ngIf="scanning">
+    Cancel
+  </button>
+
+  <video #video autoplay playsinline [hidden]="!scanning"></video>
+  
+<canvas #canvas style="width:300px; height:300px;"></canvas>
+
+  <p class="result" *ngIf="result" >Decoded: {{ result }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+</div>
