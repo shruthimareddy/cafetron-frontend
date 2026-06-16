@@ -1,0 +1,115 @@
+<div class="menu-manage-wrapper">
+  <div class="menu-manage-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>🍽️ Manage Menu Items</h1>
+        <p class="subtitle">Create, edit, and manage your menu items</p>
+      </div>
+      <button class="btn btn-primary" (click)="openCreateForm()">+ Add New Item</button>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Success Toast -->
+    <div *ngIf="toast" [ngClass]="{'toast': true, 'toast-success': toastType === 'success', 'toast-error': toastType === 'error'}">
+      {{ toast }}
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" *ngIf="!isLoading && items.length > 0">
+      <div class="filter-group">
+        <label>Vendor:</label>
+        <select [(ngModel)]="filterVendorId" (change)="onFilterChange()">
+          <option [value]="null">All Vendors</option>
+          <option *ngFor="let vendor of vendors" [value]="vendor.id">{{ vendor.name }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Status:</label>
+        <select [(ngModel)]="filterAvailable" (change)="onFilterChange()">
+          <option value="all">All Items</option>
+          <option value="available">Available Only</option>
+          <option value="unavailable">Unavailable Only</option>
+        </select>
+      </div>
+
+      <div class="filter-info">Showing {{ filteredItems.length }} of {{ items.length }} items</div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading menu items...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && items.length === 0" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h2>No Menu Items Yet</h2>
+      <p>Create your first menu item to get started.</p>
+      <button class="btn btn-primary" (click)="openCreateForm()">Create Item</button>
+    </div>
+
+    <!-- Items Grid -->
+    <div *ngIf="!isLoading && filteredItems.length > 0" class="items-grid">
+      <div *ngFor="let item of filteredItems" class="item-card">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div>
+            <h3>{{ item.itemName }}</h3>
+            <p class="vendor-name">{{ getVendorName(item.vendorId) }}</p>
+          </div>
+          <span [ngClass]="getStatusClass(item.isAvailable)" class="status-badge">
+            {{ item.isAvailable ? 'Available' : 'Unavailable' }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">💰 Price</span>
+            <span class="value">${{ item.price | number: '1.2-2' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">📦 Stock</span>
+            <span class="value">{{ item.stock }} units</span>
+          </div>
+          <div class="info-row">
+            <span class="label">🏷️ Type</span>
+            <span class="value">{{ item.foodType }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <button class="btn-icon btn-secondary" (click)="openEditForm(item)" title="Edit">✏️</button>
+          <button class="btn-icon btn-toggle" (click)="toggleAvailability(item)"
+                  title="Toggle Availability">{{ item.isAvailable ? '✓' : '✗' }}</button>
+          <button class="btn-icon btn-danger" (click)="deleteItem(item)" title="Delete">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Filtered State -->
+    <div *ngIf="!isLoading && items.length > 0 && filteredItems.length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>No Items Match Filters</h2>
+      <p>Try adjusting your filter criteria.</p>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <menu-item-form
+    *ngIf="showForm"
+    [item]="selectedItem"
+    [vendors]="vendors"
+    (close)="closeForm()"
+    (save)="onFormSave()"
+  ></menu-item-form>
+</div>

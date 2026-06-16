@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MenuService } from '../menu.service';
 import { MenuItem } from '../menu.models';
 
 @Component({
   selector: 'app-menu-browse',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './menu-browse.component.html',
+  styleUrl: './menu-browse.component.css',
 })
 export class MenuBrowseComponent implements OnInit {
 
@@ -40,4 +43,9 @@ export class MenuBrowseComponent implements OnInit {
       this.menuService.filterByFoodType(type).subscribe(data => this.items = data);
     }
   }
+
+  trackByItemId(index: number, item: MenuItem): number {
+    return item.id;
+  }
 }
+

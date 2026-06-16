@@ -7,6 +7,12 @@ import { OrderHistoryComponent } from './features/cart-order/order-history/order
 import { OrderDetailComponent } from './features/cart-order/order-history/order-detail/order-detail.component';
 import { MenuBrowseComponent } from './features/menu/menu-browse/menu-browse.component';
 
+// Menu Management Components
+import { MenuManageComponent } from './features/menu/menu-manage/menu-manage.component';
+
+// Vendor Management Components
+import { VendorManageComponent } from './features/vendor/vendor-manage/vendor-manage.component';
+
 // import { APP_ROLES, AppRole, roleGuard } from './core/guards/role.guard';
 // import { authGuard } from './core/guards/auth.guard';
 
@@ -59,12 +65,11 @@ export const routes: Routes = [
     // roles: [APP_ROLES.employee, APP_ROLES.counter, APP_ROLES.admin],
     componentPath: 'features/menu/menu-browse/menu-browse.component',
   }),
-  featureRoute({
+  {
     path: 'menu/manage',
     title: 'Manage Menu',
-    // roles: [APP_ROLES.counter, APP_ROLES.admin],
-    componentPath: 'features/menu/menu-manage/menu-manage.component',
-  }),
+    component: MenuManageComponent,
+  },
   featureRoute({
     path: 'cart',
     title: 'Cart',
@@ -142,6 +147,11 @@ export const routes: Routes = [
       .then(m => m.OperationsComponent)
     // roles: [APP_ROLES.admin],
     // componentPath: 'features/admin/operations/operations.component',
+  },
+  {
+    path: 'admin/vendors',
+    title: 'Manage Vendors',
+    component: VendorManageComponent,
   },
   {
     path: 'test/menu',

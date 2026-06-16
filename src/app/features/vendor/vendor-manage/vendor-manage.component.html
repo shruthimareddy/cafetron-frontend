@@ -1,0 +1,110 @@
+<div class="vendor-manage-wrapper">
+  <div class="vendor-manage-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>🏪 Manage Vendors</h1>
+        <p class="subtitle">Manage vendor accounts and settings</p>
+      </div>
+      <button class="btn btn-primary" (click)="openCreateForm()">+ Add New Vendor</button>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Success Toast -->
+    <div *ngIf="toast" [ngClass]="{'toast': true, 'toast-success': toastType === 'success', 'toast-error': toastType === 'error'}">
+      {{ toast }}
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" *ngIf="!isLoading && vendors.length > 0">
+      <div class="filter-group">
+        <label>Status:</label>
+        <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+          <option value="all">All Vendors</option>
+          <option value="active">Active Only</option>
+          <option value="inactive">Inactive Only</option>
+        </select>
+      </div>
+
+      <div class="filter-info">Showing {{ filteredVendors.length }} of {{ vendors.length }} vendors</div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading vendors...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && vendors.length === 0" class="empty-state">
+      <div class="empty-icon">🏪</div>
+      <h2>No Vendors Yet</h2>
+      <p>Create your first vendor to get started.</p>
+      <button class="btn btn-primary" (click)="openCreateForm()">Create Vendor</button>
+    </div>
+
+    <!-- Vendors Grid -->
+    <div *ngIf="!isLoading && filteredVendors.length > 0" class="vendors-grid">
+      <div *ngFor="let vendor of filteredVendors" class="vendor-card">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div>
+            <h3>{{ vendor.name }}</h3>
+            <p class="vendor-email">{{ vendor.email }}</p>
+          </div>
+          <span [ngClass]="getStatusClass(vendor.isActive)" class="status-badge">
+            {{ vendor.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">📧 Email</span>
+            <span class="value">{{ vendor.email }}</span>
+          </div>
+          <div class="info-row" *ngIf="vendor.phone">
+            <span class="label">📱 Phone</span>
+            <span class="value">{{ vendor.phone }}</span>
+          </div>
+          <div class="info-row" *ngIf="vendor.contactPerson">
+            <span class="label">👤 Contact Person</span>
+            <span class="value">{{ vendor.contactPerson }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">📅 Created</span>
+            <span class="value">{{ vendor.createdAt | date: 'short' }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <button class="btn-icon btn-secondary" (click)="openEditForm(vendor)" title="Edit">✏️</button>
+          <button class="btn-icon btn-toggle" (click)="toggleActive(vendor)"
+                  title="Toggle Status">{{ vendor.isActive ? '✓' : '✗' }}</button>
+          <button class="btn-icon btn-danger" (click)="deleteVendor(vendor)" title="Delete">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Filtered State -->
+    <div *ngIf="!isLoading && vendors.length > 0 && filteredVendors.length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>No Vendors Match Filters</h2>
+      <p>Try adjusting your filter criteria.</p>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <vendor-form
+    *ngIf="showForm"
+    [vendor]="selectedVendor"
+    (close)="closeForm()"
+    (save)="onFormSave()"
+  ></vendor-form>
+</div>

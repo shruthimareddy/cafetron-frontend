@@ -1,41 +1,60 @@
-<h1>Today's Menu</h1>
+<div class="menu-browse-wrapper">
+  <div class="menu-browse-container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>🍽️ Today's Menu</h1>
+      <p class="subtitle">Browse and add items to your cart</p>
+    </div>
 
-<input type="text" placeholder="Search dishes..." (input)="onSearch($event)" />
+    <!-- Search Bar -->
+    <div class="search-section">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="🔍 Search dishes..."
+        (input)="onSearch($event)"
+      />
+    </div>
 
-<div class="filters">
-  <button (click)="applyFilter('ALL')">All</button>
-  <button (click)="applyFilter('VEG')">Veg</button>
-  <button (click)="applyFilter('NON_VEG')">Non-Veg</button>
-  <button (click)="applyFilter('VEGAN')">Vegan</button>
-  <button (click)="applyFilter('JAIN')">Jain</button>
-</div>
+    <!-- Filter Buttons -->
+    <div class="filters">
+      <button
+        *ngFor="let filter of ['ALL', 'VEG', 'NON_VEG', 'VEGAN', 'JAIN']"
+        [class.active]="activeFilter === filter"
+        class="filter-btn"
+        (click)="applyFilter(filter)"
+      >
+        {{ filter === 'ALL' ? 'All' : filter.replace('_', ' ') }}
+      </button>
+    </div>
 
-@for (item of items; track item.id) {
-  <div class="menu-card">
-    <h3>{{ item.itemName }}</h3>
-    <p>{{ item.vendorName }} · {{ item.foodType }}</p>
-    <p>₹{{ item.price }}</p>
+    <!-- Menu Items Grid -->
+    <div *ngIf="items.length > 0" class="items-grid">
+      <div *ngFor="let item of items; trackBy: trackByItemId" class="menu-card">
+        <div class="card-header">
+          <h3>{{ item.itemName }}</h3>
+        </div>
+
+        <div class="card-body">
+          <p class="vendor-info">
+            <span class="vendor-name">{{ item.vendorName }}</span>
+            <span class="separator">·</span>
+            <span class="food-type">{{ item.foodType }}</span>
+          </p>
+        </div>
+
+        <div class="card-footer">
+          <div class="price">₹{{ item.price | number: '1.2-2' }}</div>
+          <button class="btn-add">Add to Cart →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="items.length === 0" class="empty-state">
+      <div class="empty-icon">🍽️</div>
+      <h2>No Items Available</h2>
+      <p>No menu items match your search or filter. Try adjusting your criteria.</p>
+    </div>
   </div>
-} @empty {
-  <p>No items on the menu right now.</p>
-}<h1>Today's Menu</h1>
-
-<input type="text" placeholder="Search dishes..." (input)="onSearch($event)" />
-
-<div class="filters">
-  <button (click)="applyFilter('ALL')">All</button>
-  <button (click)="applyFilter('VEG')">Veg</button>
-  <button (click)="applyFilter('NON_VEG')">Non-Veg</button>
-  <button (click)="applyFilter('VEGAN')">Vegan</button>
-  <button (click)="applyFilter('JAIN')">Jain</button>
 </div>
-
-@for (item of items; track item.id) {
-  <div class="menu-card">
-    <h3>{{ item.itemName }}</h3>
-    <p>{{ item.vendorName }} · {{ item.foodType }}</p>
-    <p>₹{{ item.price }}</p>
-  </div>
-} @empty {
-  <p>No items on the menu right now.</p>
-}

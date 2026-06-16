@@ -1,0 +1,103 @@
+<div class="form-modal-overlay" (click)="onCancel()">
+  <div class="form-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ item ? 'Edit Menu Item' : 'Create New Menu Item' }}</h2>
+      <button class="close-btn" (click)="onCancel()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error Alert -->
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <!-- Item Name -->
+        <div class="form-group">
+          <label for="itemName">Item Name *</label>
+          <input
+            id="itemName"
+            type="text"
+            [(ngModel)]="itemName"
+            name="itemName"
+            placeholder="e.g., Grilled Chicken Sandwich"
+            required
+          />
+          <span *ngIf="!itemName" class="error-text">Item name is required</span>
+        </div>
+
+        <!-- Vendor Selection -->
+        <div class="form-group">
+          <label for="vendorId">Vendor *</label>
+          <select id="vendorId" [(ngModel)]="vendorId" name="vendorId" required>
+            <option [value]="null">-- Select Vendor --</option>
+            <option *ngFor="let vendor of vendors" [value]="vendor.id">
+              {{ vendor.name }}
+            </option>
+          </select>
+          <span *ngIf="!vendorId" class="error-text">Vendor is required</span>
+        </div>
+
+        <!-- Price -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="price">Price *</label>
+            <input
+              id="price"
+              type="number"
+              [(ngModel)]="price"
+              name="price"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              required
+            />
+            <span *ngIf="price === null || price <= 0" class="error-text">
+              Price must be greater than 0
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">Stock *</label>
+            <input
+              id="stock"
+              type="number"
+              [(ngModel)]="stock"
+              name="stock"
+              placeholder="0"
+              step="1"
+              min="0"
+              required
+            />
+            <span *ngIf="stock === null || stock < 0" class="error-text">
+              Stock cannot be negative
+            </span>
+          </div>
+        </div>
+
+        <!-- Food Type -->
+        <div class="form-group">
+          <label for="foodType">Food Type *</label>
+          <input
+            id="foodType"
+            type="text"
+            [(ngModel)]="foodType"
+            name="foodType"
+            placeholder="e.g., Sandwich, Salad, Beverage"
+            required
+          />
+          <span *ngIf="!foodType" class="error-text">Food type is required</span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!isFormValid() || isSaving">
+            {{ isSaving ? 'Saving...' : 'Save Item' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

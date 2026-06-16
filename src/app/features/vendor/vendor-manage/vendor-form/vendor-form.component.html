@@ -1,0 +1,80 @@
+<div class="form-modal-overlay" (click)="onCancel()">
+  <div class="form-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ vendor ? 'Edit Vendor' : 'Create New Vendor' }}</h2>
+      <button class="close-btn" (click)="onCancel()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error Alert -->
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <!-- Vendor Name -->
+        <div class="form-group">
+          <label for="name">Vendor Name *</label>
+          <input
+            id="name"
+            type="text"
+            [(ngModel)]="name"
+            name="name"
+            placeholder="e.g., Pizza Palace"
+            required
+          />
+          <span *ngIf="!name" class="error-text">Vendor name is required</span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="vendor@example.com"
+            required
+          />
+          <span *ngIf="!email || !isValidEmail(email)" class="error-text">
+            Valid email is required
+          </span>
+        </div>
+
+        <!-- Phone (Optional) -->
+        <div class="form-group">
+          <label for="phone">Phone (Optional)</label>
+          <input
+            id="phone"
+            type="tel"
+            [(ngModel)]="phone"
+            name="phone"
+            placeholder="+1 (555) 000-0000"
+          />
+        </div>
+
+        <!-- Contact Person (Optional) -->
+        <div class="form-group">
+          <label for="contactPerson">Contact Person (Optional)</label>
+          <input
+            id="contactPerson"
+            type="text"
+            [(ngModel)]="contactPerson"
+            name="contactPerson"
+            placeholder="e.g., John Smith"
+          />
+        </div>
+
+        <!-- Buttons -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!isFormValid() || isSaving">
+            {{ isSaving ? 'Saving...' : 'Save Vendor' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
