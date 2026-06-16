@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { Route, Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { roleGuard } from './core/guards/role.guard';
+
+// Cart-Order Components
+import { CheckoutComponent } from './features/cart-order/checkout/checkout.component';
+import { OrderHistoryComponent } from './features/cart-order/order-history/order-history.component';
+import { OrderDetailComponent } from './features/cart-order/order-history/order-detail/order-detail.component';
+
+// import { APP_ROLES, AppRole, roleGuard } from './core/guards/role.guard';
+// import { authGuard } from './core/guards/auth.guard';
 
 @Component({
   standalone: true,
@@ -68,16 +74,21 @@ export const routes: Routes = [
     title: 'Cart',
     componentPath: 'features/cart-order/cart/cart.component',
   }),
-  featureRoute({
+  {
     path: 'checkout',
     title: 'Checkout',
-    componentPath: 'features/cart-order/checkout/checkout.component',
-  }),
-  featureRoute({
+    component: CheckoutComponent,
+  },
+  {
     path: 'orders',
     title: 'Order History',
-    componentPath: 'features/cart-order/order-history/order-history.component',
-  }),
+    component: OrderHistoryComponent,
+  },
+  {
+    path: 'orders/:orderId',
+    title: 'Order Detail',
+    component: OrderDetailComponent,
+  },
   featureRoute({
     path: 'wallet',
     title: 'Wallet',
@@ -113,16 +124,24 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: 'admin/dashboard',
   },
-  featureRoute({
+  {
     path: 'admin/dashboard',
     title: 'Admin Dashboard',
-    componentPath: 'features/admin/dashboard/dashboard.component',
-  }),
-  featureRoute({
+    loadComponent: () =>
+    import('./features/admin/dashboard/dashboard.component')
+      .then(m => m.DashboardComponent)
+    // roles: [APP_ROLES.admin],
+    // componentPath: 'features/admin/dashboard/dashboard.component',
+  },
+  {
     path: 'admin/operations',
     title: 'Operations',
-    componentPath: 'features/admin/operations/operations.component',
-  }),
+    loadComponent: () =>
+    import('./features/admin/operations/operations.component')
+      .then(m => m.OperationsComponent)
+    // roles: [APP_ROLES.admin],
+    // componentPath: 'features/admin/operations/operations.component',
+  },
   {
     path: '**',
     redirectTo: 'login',        // ← changed from 'menu' to 'login'

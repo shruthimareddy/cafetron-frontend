@@ -1,0 +1,132 @@
+<div class="detail-wrapper">
+  <div class="detail-container">
+    <!-- Header with Back Button -->
+    <div class="detail-header">
+      <button class="back-btn" (click)="goBack()">← Back to Orders</button>
+      <h1>📋 Order Details</h1>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading order details...</p>
+    </div>
+
+    <!-- Order Content -->
+    <div *ngIf="!isLoading && order">
+      <!-- Order Summary -->
+      <div class="section summary-section">
+        <h2 class="section-title">🔍 Order Summary</h2>
+
+        <div class="summary-grid">
+          <div class="summary-item">
+            <label>Order ID:</label>
+            <div class="summary-value">
+              <span class="id-badge">#{{ order.orderId }}</span>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <label>Status:</label>
+            <div class="summary-value">
+              <span [ngClass]="getStatusColor(order.overallStatus)" class="status-badge">
+                {{ order.overallStatus }}
+              </span>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <label>Payment:</label>
+            <div class="summary-value">
+              <span [ngClass]="getStatusColor(order.paymentStatus)" class="status-badge">
+                {{ order.paymentStatus }}
+              </span>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <label>Total Amount:</label>
+            <div class="summary-value">
+              <span class="total-amount">${{ order.totalAmount | number: '1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <label>Pickup Time:</label>
+            <div class="summary-value">{{ order.pickupSlot }}</div>
+          </div>
+
+          <div class="summary-item">
+            <label>Location:</label>
+            <div class="summary-value">{{ order.location }}</div>
+          </div>
+
+          <div class="summary-item">
+            <label>Order Date:</label>
+            <div class="summary-value">{{ order.createdAt | date: 'medium' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items Table -->
+      <div class="section items-section">
+        <h2 class="section-title">🛍️ Items</h2>
+
+        <div class="items-table-wrapper">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th class="center">Quantity</th>
+                <th class="center">Unit Price</th>
+                <th class="center">Subtotal</th>
+                <th class="center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of order.items">
+                <td class="item-name">{{ item.itemName }}</td>
+                <td class="center">{{ item.quantity }}</td>
+                <td class="center">${{ item.unitPrice | number: '1.2-2' }}</td>
+                <td class="center amount">${{ (item.quantity * item.unitPrice) | number: '1.2-2' }}</td>
+                <td class="center">
+                  <span [ngClass]="getVendorStatusColor(item.vendorStatus)" class="vendor-badge">
+                    {{ item.vendorStatus }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- QR Code Section -->
+      <div *ngIf="order.qrToken" class="section qr-section">
+        <h2 class="section-title">📲 Pickup QR Code</h2>
+        <div class="qr-content">
+          <p class="qr-description">Show this QR code at pickup</p>
+          <div class="qr-token">{{ order.qrToken }}</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="section actions-section">
+        <button
+          class="btn btn-timeout"
+          (click)="onProcessTimeout()"
+          [disabled]="isProcessingTimeout"
+          type="button"
+        >
+          <span *ngIf="!isProcessingTimeout">⏱️ Request Timeout</span>
+          <span *ngIf="isProcessingTimeout">⏳ Processing...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

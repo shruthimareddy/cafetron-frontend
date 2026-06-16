@@ -1,0 +1,77 @@
+<div class="order-history-wrapper">
+  <div class="order-history-container">
+    <!-- Header -->
+    <div class="history-header">
+      <h1>📦 My Orders</h1>
+      <p class="subtitle">Track your orders and view details</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your orders...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && orders.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h2>No Orders Yet</h2>
+      <p>You haven't placed any orders yet.</p>
+      <a routerLink="/menu" class="btn btn-primary">Start Ordering</a>
+    </div>
+
+    <!-- Orders Grid -->
+    <div *ngIf="!isLoading && orders.length > 0" class="orders-grid">
+      <div
+        *ngFor="let order of orders"
+        class="order-card"
+        (click)="viewOrderDetail(order.orderId)"
+      >
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="order-id">Order #{{ order.orderId }}</div>
+          <span [ngClass]="getStatusColor(order.overallStatus)" class="status-badge">
+            {{ order.overallStatus }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">🛍️ Total</span>
+            <span class="value amount">${{ order.totalAmount | number: '1.2-2' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">⏰ Pickup</span>
+            <span class="value">{{ order.pickupSlot }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">📍 Location</span>
+            <span class="value">{{ order.location }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">💳 Payment</span>
+            <span [ngClass]="getPaymentStatusColor(order.paymentStatus)" class="payment-badge">
+              {{ order.paymentStatus }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="label">📅 Ordered</span>
+            <span class="value">{{ order.createdAt | date: 'short' }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <span class="view-link">View Details →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

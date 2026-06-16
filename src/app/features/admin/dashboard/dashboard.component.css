@@ -1,0 +1,137 @@
+.dashboard { max-width: 1100px; padding-bottom: 40px; }
+
+/* Header */
+.page-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 28px;
+}
+.page-title { font-size: 22px; font-weight: 700; color: #0f172a; }
+.page-sub { font-size: 13px; color: #64748b; margin-top: 3px; }
+.header-controls { display: flex; gap: 12px; align-items: flex-end; }
+.ctrl-label {
+  display: block; font-size: 11px; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.date-input {
+  padding: 8px 12px; border: 1px solid #e2e8f0;
+  border-radius: 8px; font-size: 14px; color: #0f172a;
+  background: #fff; cursor: pointer;
+}
+.date-input:focus { outline: none; border-color: #f59e0b; }
+.date-input.sm { padding: 6px 10px; font-size: 13px; }
+
+/* KPI */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+.kpi-card {
+  background: #fff; border-radius: 12px; padding: 18px 20px;
+  border: 1px solid #e9edf5; display: flex;
+  align-items: center; gap: 14px;
+}
+.kpi-card.highlight { border-color: #f59e0b; background: #fffbeb; }
+.kpi-card.warn { border-color: #ef4444; background: #fef2f2; }
+.kpi-icon { font-size: 26px; }
+.kpi-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.kpi-value { font-size: 26px; font-weight: 800; color: #0f172a; margin-top: 2px; }
+.kpi-card.highlight .kpi-value { color: #d97706; }
+.kpi-card.warn .kpi-value { color: #dc2626; }
+
+/* Charts */
+.chart-card {
+  background: #fff; border-radius: 12px;
+  padding: 22px; border: 1px solid #e9edf5;
+  margin-bottom: 16px;
+}
+.full-width { width: 100%; }
+.chart-card-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 18px;
+}
+.chart-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+.chart-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.chart-body { position: relative; height: 220px; }
+.chart-body canvas { max-height: 220px; }
+.chart-body.tall { height: 200px; }
+.empty-chart {
+  height: 180px; display: flex; align-items: center;
+  justify-content: center; color: #94a3b8; font-size: 14px;
+}
+.range-controls {
+  display: flex; align-items: center; gap: 8px;
+}
+.range-sep { font-size: 13px; color: #94a3b8; }
+
+/* Export button */
+.export-btn {
+  padding: 6px 12px; background: #f8fafc;
+  border: 1px solid #e2e8f0; border-radius: 6px;
+  font-size: 12px; font-weight: 600; color: #475569;
+  cursor: pointer; white-space: nowrap;
+}
+.export-btn:hover { background: #f1f5f9; color: #0f172a; }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data-table th {
+  text-align: left; padding: 10px 12px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #64748b; font-weight: 600; border-bottom: 2px solid #f1f5f9;
+}
+.data-table td {
+  padding: 12px; border-bottom: 1px solid #f8fafc; color: #334155;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #fafbfc; }
+.rank { font-weight: 700; color: #94a3b8; width: 32px; }
+.count-cell { font-weight: 700; color: #0f172a; }
+.amount-cell { font-weight: 700; color: #059669; }
+
+/* Status badges */
+.status-badge {
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.status-collected  { background: #f0fdf4; color: #16a34a; }
+.status-ready      { background: #eff6ff; color: #2563eb; }
+.status-accepted   { background: #f5f3ff; color: #7c3aed; }
+.status-pending    { background: #fffbeb; color: #d97706; }
+.status-declined   { background: #fef2f2; color: #dc2626; }
+.status-cancelled  { background: #f8fafc; color: #64748b; }
+
+.decline-badge {
+  background: #fef2f2; color: #dc2626;
+  padding: 2px 8px; border-radius: 4px;
+  font-size: 12px; font-weight: 700;
+}
+
+:host {
+  display: block;
+  padding: 28px 32px;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+/* Section cards */
+.section-card {
+  background: #fff; border-radius: 12px;
+  padding: 22px; border: 1px solid #e9edf5; margin-bottom: 16px;
+}
+.section-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 18px;
+}
+.section-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.section-chart {
+  position: relative; height: 260px;
+}
+.section-chart canvas { max-height: 260px; }
+.section-chart.doughnut { height: 240px; }
+.section-chart.doughnut canvas { max-height: 240px; }
+.section-table { overflow-x: auto; }

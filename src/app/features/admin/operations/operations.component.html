@@ -1,0 +1,155 @@
+<div class="ops-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Operations</h1>
+      <p class="page-sub">Control ordering window and daily cutoff time</p>
+    </div>
+    <div class="live-badge">
+      <span class="live-dot"></span> Live
+    </div>
+  </div>
+
+  <!-- Status Banner -->
+  <div class="status-banner"
+       [class.banner-open]="orderingAllowed"
+       [class.banner-closed]="!orderingAllowed"
+       *ngIf="status">
+    <span class="banner-icon">
+      {{ orderingAllowed ? '🟢' : '🔴' }}
+    </span>
+    <div class="banner-text">
+      <strong>
+        {{ orderingAllowed
+            ? 'Ordering is open — employees can place orders'
+            : !status!.windowOpen
+              ? 'Ordering is closed manually'
+              : 'Ordering is closed — cutoff time has passed' }}
+      </strong>
+      <span>
+        Cutoff: <b>{{ to12hr(status!.cutoffTime) }}</b>
+        <span class="tag-passed" *ngIf="status!.cutoffPassed">passed</span>
+        <span class="tag-ok" *ngIf="!status!.cutoffPassed">not reached yet</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="ops-grid">
+
+    <!-- Window Toggle Card -->
+    <div class="ops-card">
+      <div class="ops-card-top">
+        <span class="ops-icon">🪟</span>
+        <div>
+          <h2 class="ops-card-title">Ordering Window</h2>
+          <p class="ops-card-sub">Manually open or close ordering for the day</p>
+        </div>
+      </div>
+
+      <div class="toggle-row" *ngIf="status">
+        <span class="toggle-label" [class.label-open]="status!.windowOpen">
+          {{ status!.windowOpen ? 'Open' : 'Closed' }}
+        </span>
+        <button class="toggle-btn"
+                [class.toggle-on]="status!.windowOpen"
+                (click)="toggleWindow()"
+                [disabled]="toggling">
+          <span class="toggle-thumb"></span>
+        </button>
+      </div>
+
+      <p class="ops-note">
+        Closing the window blocks orders immediately, even before the cutoff time.
+        Reopening it allows orders again until the cutoff is reached.
+      </p>
+    </div>
+
+    <!-- Cutoff Time Card -->
+    <div class="ops-card">
+      <div class="ops-card-top">
+        <span class="ops-icon">⏰</span>
+        <div>
+          <h2 class="ops-card-title">Daily Cutoff Time</h2>
+          <p class="ops-card-sub">Orders are automatically blocked after this time</p>
+        </div>
+      </div>
+
+      <div class="cutoff-form">
+        <label class="input-label">Set cutoff time</label>
+        <div class="cutoff-row">
+          <!-- type="time" always uses 24hr internally — that's correct -->
+          <input type="time"
+                 [(ngModel)]="newCutoffTime"
+                 class="time-input" />
+          <button class="save-btn"
+                  (click)="saveCutoff()"
+                  [disabled]="!newCutoffTime || saving">
+            {{ saving ? 'Saving…' : 'Update' }}
+          </button>
+        </div>
+        <!-- Display in 12hr format -->
+        <p class="current-val" *ngIf="status">
+          Current cutoff: <strong>{{ to12hr(status!.cutoffTime) }}</strong>
+        </p>
+        <p class="reset-note">
+          ⏱ Cutoff automatically resets to <strong>03:00 PM</strong> every midnight.
+          Changes made here apply for today only.
+        </p>
+      </div>
+
+      <p class="ops-note">
+        Changes take effect immediately.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- System Status Table -->
+  <div class="status-table-card" *ngIf="status">
+    <h2 class="chart-title" style="margin-bottom: 18px;">System Status</h2>
+    <div class="status-rows">
+
+      <div class="status-row">
+        <span class="status-key">Window toggle</span>
+        <span class="status-val"
+              [class.val-green]="status!.windowOpen"
+              [class.val-red]="!status!.windowOpen">
+          {{ status!.windowOpen ? '✓ Open' : '✗ Closed' }}
+        </span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-key">Cutoff time</span>
+        <!-- 12hr format here too -->
+        <span class="status-val">{{ to12hr(status!.cutoffTime) }}</span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-key">Cutoff status</span>
+        <span class="status-val"
+              [class.val-red]="status!.cutoffPassed"
+              [class.val-green]="!status!.cutoffPassed">
+          {{ status!.cutoffPassed ? '✗ Passed' : '✓ Not reached' }}
+        </span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-key">Ordering allowed</span>
+        <span class="status-val"
+              [class.val-green]="orderingAllowed"
+              [class.val-red]="!orderingAllowed">
+          {{ orderingAllowed ? '✓ Yes' : '✗ No' }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast"
+       [class.toast-visible]="!!toast"
+       [class.toast-error]="toastType === 'error'">
+    {{ toast }}
+  </div>
+
+</div>

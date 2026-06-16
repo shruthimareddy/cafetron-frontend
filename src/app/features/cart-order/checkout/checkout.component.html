@@ -1,0 +1,95 @@
+<div class="checkout-wrapper">
+  <div class="checkout-container">
+    <!-- Header -->
+    <div class="checkout-header">
+      <h1>🛒 Checkout</h1>
+      <p class="subtitle">Review your order and select a pickup time</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="checkout-content">
+      <!-- Left: Order Items -->
+      <div class="section items-section">
+        <h2 class="section-title">📋 Order Items</h2>
+
+        <div *ngIf="cartItems.length === 0" class="empty-message">
+          Your cart is empty. <a routerLink="/menu" class="link">Continue shopping →</a>
+        </div>
+
+        <div *ngIf="cartItems.length > 0" class="items-container">
+          <div *ngFor="let item of cartItems" class="item-row">
+            <div class="item-details">
+              <div class="item-id">Item #{{ item.menuItemId }}</div>
+              <div class="item-qty">Quantity: {{ item.quantity }}</div>
+            </div>
+            <div class="item-price">${{ (item.quantity * 50) | number: '1.2-2' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Summary & Pickup -->
+      <div class="section summary-section">
+        <!-- Order Summary -->
+        <div class="summary-box">
+          <h2 class="section-title">💰 Order Summary</h2>
+          <div class="summary-row">
+            <span class="label">Subtotal:</span>
+            <span class="value">${{ (totalAmount * 0.9) | number: '1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Tax (10%):</span>
+            <span class="value">${{ (totalAmount * 0.1) | number: '1.2-2' }}</span>
+          </div>
+          <div class="summary-row total">
+            <span class="label">Total:</span>
+            <span class="value">${{ totalAmount | number: '1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- Pickup Time Selection -->
+        <div class="pickup-box">
+          <h2 class="section-title">⏰ Pickup Time</h2>
+          <select [(ngModel)]="selectedPickupSlot" class="time-select">
+            <option value="">-- Select a time --</option>
+            <option *ngFor="let slot of pickupSlots" [value]="slot">
+              {{ slot }}
+            </option>
+          </select>
+
+          <div *ngIf="selectedPickupSlot" class="time-selected">
+            <span class="check-icon">✓</span>
+            <span>Pickup at {{ selectedPickupSlot }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-footer">
+      <button
+        class="btn btn-secondary"
+        routerLink="/menu"
+        type="button"
+      >
+        ← Continue Shopping
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="onPlaceOrder()"
+        [disabled]="isLoading || cartItems.length === 0"
+        type="button"
+      >
+        <span *ngIf="!isLoading; else loading">Place Order</span>
+        <ng-template #loading>
+          <span>⏳ Placing Order...</span>
+        </ng-template>
+      </button>
+    </div>
+  </div>
+</div>

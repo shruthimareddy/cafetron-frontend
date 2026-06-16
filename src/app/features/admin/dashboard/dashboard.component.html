@@ -1,0 +1,202 @@
+<div class="dashboard">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-sub">Daily overview of orders, revenue, and vendor performance</p>
+    </div>
+    <div class="header-controls">
+      <div class="date-group">
+        <label class="ctrl-label">Date</label>
+        <input type="date"
+               [(ngModel)]="selectedDate"
+               (ngModelChange)="onDateChange()"
+               [max]="today"
+               class="date-input" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton while loading -->
+  <div class="skeleton-wrapper" *ngIf="loading">
+    <div class="skeleton-row">
+      <div class="skeleton kpi"></div>
+      <div class="skeleton kpi"></div>
+      <div class="skeleton kpi"></div>
+      <div class="skeleton kpi"></div>
+    </div>
+    <div class="skeleton chart-tall"></div>
+    <div class="skeleton-row two-col">
+      <div class="skeleton chart"></div>
+      <div class="skeleton chart"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading">
+
+    <div class="kpi-row" *ngIf="summary">
+      <div class="kpi-card">
+        <span class="kpi-icon">🛒</span>
+        <div>
+          <p class="kpi-label">Total Orders</p>
+          <p class="kpi-value">{{ summary.orderCount }}</p>
+        </div>
+      </div>
+      <div class="kpi-card highlight">
+        <span class="kpi-icon">💰</span>
+        <div>
+          <p class="kpi-label">Revenue</p>
+          <p class="kpi-value">₹{{ summary.revenue | number:'1.0-0' }}</p>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-icon">🍽️</span>
+        <div>
+          <p class="kpi-label">Items Sold</p>
+          <p class="kpi-value">{{ summary.itemsSold }}</p>
+        </div>
+      </div>
+      <div class="kpi-card" [class.warn]="vendorDeclines.length > 0">
+        <span class="kpi-icon">⚠️</span>
+        <div>
+          <p class="kpi-label">Vendor Declines</p>
+          <p class="kpi-value">{{ vendorDeclines.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="chart-card full-width">
+      <div class="chart-card-header">
+        <div>
+          <h2 class="chart-title">Revenue Trend</h2>
+          <p class="chart-sub">Daily revenue over selected range</p>
+        </div>
+        <div class="range-controls">
+          <input type="date"
+                 [(ngModel)]="rangeFrom"
+                 (ngModelChange)="onRangeChange()"
+                 [max]="rangeTo"
+                 class="date-input sm" />
+          <span class="range-sep">to</span>
+          <input type="date"
+                 [(ngModel)]="rangeTo"
+                 (ngModelChange)="onRangeChange()"
+                 [max]="today"
+                 class="date-input sm" />
+          <button class="export-btn" (click)="downloadRange()">⬇ CSV</button>
+        </div>
+      </div>
+      <div class="chart-body tall" *ngIf="revenueChart.labels?.length; else noRevenue">
+        <canvas baseChart
+                [data]="revenueChart"
+                [options]="lineOptions"
+                type="line">
+        </canvas>
+      </div>
+      <ng-template #noRevenue>
+        <div class="empty-chart">No revenue data for this range</div>
+      </ng-template>
+    </div>
+
+    <!-- Top Items -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="chart-title">Top Items</h2>
+          <p class="chart-sub">By quantity sold (all time)</p>
+        </div>
+        <button class="export-btn" (click)="downloadTopItems()">⬇ CSV</button>
+      </div>
+      <div class="section-body" *ngIf="topItems.length > 0; else noItems">
+        <div class="section-chart">
+          <canvas baseChart [data]="topItemsChart"
+                  [options]="barOptions" type="bar"></canvas>
+        </div>
+        <div class="section-table">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Item</th><th>Qty Sold</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of topItems; let i = index">
+                <td class="rank">{{ i + 1 }}</td>
+                <td>{{ item.name }}</td>
+                <td class="count-cell">{{ item.qtySold }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <ng-template #noItems>
+        <div class="empty-chart">No item data available</div>
+      </ng-template>
+    </div>
+
+    <!-- Order Status -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="chart-title">Order Status Breakdown</h2>
+          <p class="chart-sub">Breakdown for {{ selectedDate }}</p>
+        </div>
+        <button class="export-btn" (click)="downloadDaily()">⬇ Daily CSV</button>
+      </div>
+      <div class="section-body" *ngIf="statusBreakdown.length > 0; else noStatus">
+        <div class="section-chart doughnut">
+          <canvas baseChart [data]="statusChart"
+                  [options]="doughnutOptions" type="doughnut"></canvas>
+        </div>
+        <div class="section-table">
+          <table class="data-table">
+            <thead>
+              <tr><th>Status</th><th>Orders</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of statusBreakdown">
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(s.status)">
+                    {{ s.status.replace('_', ' ') }}
+                  </span>
+                </td>
+                <td class="count-cell">{{ s.count }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <ng-template #noStatus>
+        <div class="empty-chart">No orders on this date</div>
+      </ng-template>
+    </div>
+
+    <!-- Vendor Declines -->
+    <div class="section-card" *ngIf="vendorDeclines.length > 0">
+      <div class="section-header">
+        <div>
+          <h2 class="chart-title">Vendor Declines on {{ selectedDate }}</h2>
+          <p class="chart-sub">Orders declined by vendors on {{ selectedDate }}</p>
+        </div>
+        <button class="export-btn" (click)="downloadDeclines()">⬇ CSV</button>
+      </div>
+      <div class="section-body">
+        <div class="section-table">
+          <table class="data-table">
+            <thead>
+              <tr><th>Vendor</th><th>Declines</th><th>Total Refunded</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let v of vendorDeclines">
+                <td>{{ v.vendorName }}</td>
+                <td><span class="decline-badge">{{ v.declineCount }}</span></td>
+                <td class="amount-cell">₹{{ v.totalRefunded | number:'1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
