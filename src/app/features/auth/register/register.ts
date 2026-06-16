@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -23,35 +23,35 @@ export class RegisterComponent {
     role: 'EMPLOYEE'
   };
 
-  errorMessage = '';
-  successMessage = '';
-  isLoading = false;
+  errorMessage = signal('');
+  successMessage = signal('');
+  isLoading = signal(false);
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private ngZone: NgZone
+    private cdr: ChangeDetectorRef
   ) {}
 
   onSubmit(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.isLoading = true;
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.isLoading.set(true);
+    this.cdr.detectChanges();
 
     this.authService.register(this.formData).subscribe({
       next: () => {
-        this.ngZone.run(() => {
-          this.isLoading = false;
-          this.successMessage = 'Account created successfully!';
-          setTimeout(() => this.router.navigate(['/login']), 1500);
-        });
+        this.isLoading.set(false);
+        this.successMessage.set('Account created successfully!');
+        this.cdr.detectChanges();
+        setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
-        this.ngZone.run(() => {
-          this.isLoading = false;
-          this.errorMessage =
-            err.error?.error || 'Registration failed. Please try again.';
-        });
+        this.isLoading.set(false);
+        this.errorMessage.set(
+          err.error?.error || 'Registration failed. Please try again.'
+        );
+        this.cdr.detectChanges();
       }
     });
   }

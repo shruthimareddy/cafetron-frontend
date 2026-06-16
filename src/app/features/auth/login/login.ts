@@ -15,7 +15,7 @@ import { LoginRequest } from '../../../models/auth.models';
 export class LoginComponent {
 
   credentials: LoginRequest = {
-    email: '',
+    employeeId: '',
     password: ''
   };
 

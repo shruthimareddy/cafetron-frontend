@@ -7,27 +7,15 @@
         <form (ngSubmit)="onSubmit()">
 
             <div class="form-group">
-                <label for="email">Email</label>
-                <input
-                        id="email"
-                        type="email"
-                        [(ngModel)]="credentials.email"
-                        name="email"
-                        placeholder="you@cafetron.com"
-                        required
-                />
+                <label for="employeeId">Employee ID</label>
+                <input id="employeeId" type="text" [(ngModel)]="credentials.employeeId" name="employeeId"
+                    placeholder="e.g. EMP001" required />
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input
-                        id="password"
-                        type="password"
-                        [(ngModel)]="credentials.password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                />
+                <input id="password" type="password" [(ngModel)]="credentials.password" name="password"
+                    placeholder="Enter your password" required />
             </div>
 
             <div class="error-message" *ngIf="errorMessage">

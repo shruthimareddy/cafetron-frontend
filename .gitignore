@@ -2,3 +2,5 @@ node_modules/
 dist/
 .angular/
 .npm-cache/
+.idea/
+.vscode/
