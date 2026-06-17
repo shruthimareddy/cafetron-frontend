@@ -132,6 +132,20 @@ select {
   font-size: 15px;
 }
 
+select {
+  color-scheme: dark;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+    rgba(22, 28, 36, 0.82);
+  color: #fff;
+  cursor: pointer;
+}
+
+select option {
+  background: #161c24;
+  color: #fff;
+}
+
 input:focus,
 select:focus {
   border-color: var(--primary-action);

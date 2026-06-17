@@ -251,6 +251,68 @@
   font-weight: 800;
 }
 
+.qr-section {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.qr-section h2 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.qr-content {
+  display: grid;
+  gap: 16px;
+  place-items: center;
+  margin-bottom: 20px;
+}
+
+.qr-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.qr-token {
+  width: 100%;
+  max-width: 280px;
+}
+
+.qr-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.2);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.qr-view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.28);
+}
+
+.qr-view-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
 @media (max-width: 620px) {
   .detail-shell {
     padding: 22px 14px 96px;

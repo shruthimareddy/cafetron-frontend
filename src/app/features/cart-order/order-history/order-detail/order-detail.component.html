@@ -76,7 +76,10 @@
            <div class="qr-token"><order-qr-display [orderId]="order.orderId" /></div>
         </div>
         <!-- <code>{{ order.qrToken }}</code> -->
-        <a class="timeout-btn" [routerLink]="['/pickup/qr', order.orderId]">View Pickup QR</a>
+        <a class="qr-view-btn" [routerLink]="['/pickup/qr', order.orderId]">
+          <span class="material-symbols-outlined">qr_code_2</span>
+          View Pickup QR
+        </a>
       </div>
 
       <button class="timeout-btn" (click)="onProcessTimeout()" [disabled]="isProcessingTimeout" type="button">

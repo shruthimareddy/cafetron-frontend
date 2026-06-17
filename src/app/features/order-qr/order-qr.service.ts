@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { QRResponse, QRValidationResponse } from "./order-qr.models";
 import { environment } from "src/environments/environment";
+import { OrderDetailResponse } from "../cart-order/models/order.models";
 
 @Injectable({ providedIn: 'root' })
 export class OrderQRService {
@@ -23,6 +24,12 @@ export class OrderQRService {
         
    
         return this.http.post<QRValidationResponse>(`${environment.apiUrl}/order-qr`, formData);
+    }
+
+    getOrderPreviewByToken(token: string): Observable<OrderDetailResponse> {
+        return this.http.get<OrderDetailResponse>(`${environment.apiUrl}/orders/qr-preview`, {
+            params: { token }
+        });
     }
 
 }

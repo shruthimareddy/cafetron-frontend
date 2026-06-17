@@ -138,6 +138,52 @@ h4 {
   font-weight: 800;
 }
 
+.checkout-toast {
+  position: fixed;
+  right: 22px;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, calc(100vw - 28px));
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  background: rgba(18, 24, 32, 0.88);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: var(--glass-shadow), var(--glass-glow);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  backdrop-filter: blur(22px) saturate(1.2);
+  animation: toastIn 220ms ease both;
+}
+
+.checkout-toast span:last-child {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.checkout-toast .material-symbols-outlined {
+  flex: 0 0 auto;
+  font-size: 24px;
+}
+
+.checkout-toast.toast-error {
+  border-color: rgba(239, 68, 68, 0.38);
+  background:
+    linear-gradient(135deg, rgba(127, 29, 29, 0.92), rgba(49, 31, 24, 0.92)),
+    rgba(18, 24, 32, 0.88);
+}
+
+.checkout-toast.toast-success {
+  border-color: rgba(34, 197, 94, 0.34);
+  background:
+    linear-gradient(135deg, rgba(20, 83, 45, 0.92), rgba(17, 24, 32, 0.92)),
+    rgba(18, 24, 32, 0.88);
+}
+
 .step-tabs {
   justify-content: center;
   gap: 8px;
@@ -314,17 +360,33 @@ h4 {
   text-transform: uppercase;
 }
 
-.time-slot:hover,
-.time-slot.selected {
+.time-slot:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.88);
   background: rgba(255, 255, 255, 0.26);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
 }
 
+.time-slot.selected {
+  transform: translateY(-2px);
+  border-color: #22d3ee;
+  background:
+    linear-gradient(135deg, #0891b2, #0f766e),
+    #0891b2;
+  box-shadow:
+    0 16px 32px rgba(34, 211, 238, 0.22),
+    0 0 0 3px rgba(34, 211, 238, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
 .time-slot.selected strong,
 .time-slot.selected span {
   color: #fff;
+  text-shadow: none;
+}
+
+.time-slot.selected strong {
+  font-weight: 1000;
 }
 
 .food-preview-list {
@@ -698,6 +760,18 @@ h4 {
   }
 }
 
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 1080px) {
   .overview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -791,5 +865,10 @@ h4 {
   .wallet-option .check {
     grid-column: 1 / -1;
     justify-self: end;
+  }
+
+  .checkout-toast {
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   }
 }

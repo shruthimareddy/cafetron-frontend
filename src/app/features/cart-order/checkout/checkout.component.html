@@ -44,6 +44,18 @@
       <span>{{ errorMessage }}</span>
     </div>
 
+    <div
+      *ngIf="toastMessage"
+      class="checkout-toast"
+      [class.toast-error]="toastType === 'error'"
+      [class.toast-success]="toastType === 'success'"
+      role="status"
+      aria-live="polite"
+    >
+      <span class="material-symbols-outlined">{{ toastType === 'error' ? 'error' : 'check_circle' }}</span>
+      <span>{{ toastMessage }}</span>
+    </div>
+
     <div class="step-tabs" *ngIf="checkoutView === 'cards'">
       <button
         *ngFor="let step of checkoutSteps; let i = index"

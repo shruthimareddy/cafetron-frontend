@@ -3,8 +3,10 @@ import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, Outp
 import jsQR from "jsqr";
 import { OrderQRService } from "../order-qr.service";
 import { QRValidationResponse } from "../order-qr.models";
+import { OrderDetailResponse } from "../../cart-order/models/order.models";
 
 @Component({
+    standalone: true,
     selector: 'order-qr-scanner',
     imports: [CommonModule],
     templateUrl: './order-qr-scanner.component.html',
@@ -22,9 +24,11 @@ export class OrderQrScannerComponent implements OnDestroy {
     scanning: boolean = false;  
     result: string | null = null;
     error: string | null = null;
+    orderPreview: OrderDetailResponse | null = null;
+    isLoadingPreview = false;
 
-    private stream!: MediaStream;
-    private animFrame!: number;
+    private stream: MediaStream | null = null;
+    private animFrame: number | null = null;
 
     constructor(
         private cdr: ChangeDetectorRef,
@@ -34,6 +38,15 @@ export class OrderQrScannerComponent implements OnDestroy {
     async startScanner() {
         this.result = null;
         this.error = null;
+        this.orderPreview = null;
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            this.error = 'Camera is not supported in this browser.';
+            this.cdr.detectChanges();
+            return;
+        }
+
+        this.stopCamera();
 
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({
@@ -41,17 +54,24 @@ export class OrderQrScannerComponent implements OnDestroy {
             });
 
             this.scanning = true;
+            this.cdr.detectChanges();
 
             const video = this.videoRef.nativeElement;
             video.srcObject = this.stream;
+            video.muted = true;
+            video.playsInline = true;
 
-            video.onloadedmetadata = () => {
-                video.play();
-                this.tick();
-            }
+            await new Promise<void>((resolve) => {
+                video.onloadedmetadata = () => resolve();
+            });
+
+            await video.play();
+            this.tick();
             
         } catch (err) {
             this.error = 'Camera access denied or not available!';
+            this.scanning = false;
+            this.cdr.detectChanges();
         }
     }
 
@@ -94,6 +114,9 @@ export class OrderQrScannerComponent implements OnDestroy {
                 this.result = response.message || (response.isValid ? 'QR validated successfully.' : 'QR is invalid.');
                 this.scanningCompleted.emit(response);
                 this.scanning = false;
+                if (response.isValid && response.token) {
+                    this.loadOrderPreview(response.token);
+                }
                 this.cdr.detectChanges();
             },
             error: () => {
@@ -106,11 +129,41 @@ export class OrderQrScannerComponent implements OnDestroy {
         });
   }
 
-    stopCamera() {
-    cancelAnimationFrame(this.animFrame);
-    this.stream?.getTracks().forEach(t => t.stop());
-    this.scanning = false;
-  }
+    private loadOrderPreview(token: string) {
+        this.isLoadingPreview = true;
+        this.error = null;
+        this.orderQRService.getOrderPreviewByToken(token).subscribe({
+            next: preview => {
+                this.orderPreview = preview;
+                this.isLoadingPreview = false;
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                this.error = 'QR validated, but order details could not be loaded.';
+                this.isLoadingPreview = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    getPreviewTotalItems(): number {
+        return this.orderPreview?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+    }
+
+    getLineTotal(unitPrice: number, quantity: number): number {
+        return Number(unitPrice || 0) * Number(quantity || 0);
+    }
+
+        stopCamera() {
+        if (this.animFrame !== null) {
+            cancelAnimationFrame(this.animFrame);
+            this.animFrame = null;
+        }
+
+        this.stream?.getTracks().forEach(t => t.stop());
+        this.stream = null;
+        this.scanning = false;
+    }
 
   ngOnDestroy() {
     this.stopCamera();

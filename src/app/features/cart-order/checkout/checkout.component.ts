@@ -25,9 +25,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isWalletLoading: boolean = false;
   errorMessage: string = '';
+  toastMessage: string = '';
+  toastType: 'error' | 'success' = 'error';
   checkoutView: 'cards' | 'overview' = 'cards';
   activeStep = 0;
   private destroy$ = new Subject<void>();
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   checkoutSteps = [
     { label: 'Time slot', icon: 'schedule' },
@@ -135,12 +138,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   onPlaceOrder(): void {
     if (!this.selectedPickupSlot) {
-      this.errorMessage = 'Please select a pickup time';
+      this.showToast('Please select a pickup time', 'error');
       return;
     }
 
     if (this.cartItems.length === 0) {
-      this.errorMessage = 'Your cart is empty';
+      this.showToast('Your cart is empty', 'error');
       return;
     }
 
@@ -172,12 +175,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             : error.error?.message || 'Failed to place order. Please try again.';
 
           this.errorMessage = statusMessage;
+          this.showToast(statusMessage, 'error');
           this.isLoading = false;
         },
       });
   }
 
+  private showToast(message: string, type: 'error' | 'success'): void {
+    this.errorMessage = type === 'error' ? message : this.errorMessage;
+    this.toastMessage = message;
+    this.toastType = type;
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+
+    this.toastTimeoutId = setTimeout(() => {
+      this.toastMessage = '';
+      this.toastTimeoutId = null;
+    }, 4200);
+  }
+
   ngOnDestroy(): void {
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }

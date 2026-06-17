@@ -19,7 +19,7 @@
     </div>
 
     <div class="camera-frame" [class.is-active]="scanning">
-      <video #video autoplay playsinline [hidden]="!scanning"></video>
+      <video #video autoplay playsinline muted [hidden]="!scanning"></video>
       <canvas #canvas [hidden]="!scanning"></canvas>
       <div class="camera-placeholder" *ngIf="!scanning">
         <span class="material-symbols-outlined">qr_code_scanner</span>
@@ -29,5 +29,55 @@
 
     <p class="result" *ngIf="result">Decoded: {{ result }}</p>
     <p class="error" *ngIf="error">{{ error }}</p>
+
+    <section class="preview-card" *ngIf="isLoadingPreview || orderPreview">
+      <div *ngIf="isLoadingPreview" class="preview-loading">
+        <div class="spinner"></div>
+        <p>Loading order details...</p>
+      </div>
+
+      <ng-container *ngIf="!isLoadingPreview && orderPreview as order">
+        <header class="preview-header">
+          <div>
+            <p class="eyebrow">Order preview</p>
+            <h2>Order #{{ order.orderId }}</h2>
+          </div>
+          <span class="status-pill">{{ order.overallStatus }}</span>
+        </header>
+
+        <div class="preview-summary">
+          <div>
+            <span>Pickup</span>
+            <strong>{{ order.pickupSlot || 'Slot pending' }}</strong>
+          </div>
+          <div>
+            <span>Items</span>
+            <strong>{{ getPreviewTotalItems() }}</strong>
+          </div>
+          <div>
+            <span>Total</span>
+            <strong>${{ order.totalAmount | number: '1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <div class="preview-empty" *ngIf="order.items.length === 0">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <p>This QR is valid, but this order has no items assigned to your vendor account.</p>
+        </div>
+
+        <div class="preview-items" *ngIf="order.items.length > 0">
+          <article *ngFor="let item of order.items" class="preview-item">
+            <div>
+              <h3>{{ item.itemName }}</h3>
+              <p>{{ item.vendorStatus }}</p>
+            </div>
+            <div class="preview-item-meta">
+              <span>Qty {{ item.quantity }}</span>
+              <strong>${{ getLineTotal(item.unitPrice, item.quantity) | number: '1.2-2' }}</strong>
+            </div>
+          </article>
+        </div>
+      </ng-container>
+    </section>
   </article>
 </section>
