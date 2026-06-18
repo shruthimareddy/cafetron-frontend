@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist/cafetron-frontend/browser",
+  "installCommand": "npm ci",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

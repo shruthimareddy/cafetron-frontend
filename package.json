@@ -6,8 +6,13 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:vercel": "node scripts/write-prod-environment.mjs && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
+  },
+  "engines": {
+    "node": ">=22 <25",
+    "npm": ">=10"
   },
   "dependencies": {
     "@angular/animations": "^21.2.16",

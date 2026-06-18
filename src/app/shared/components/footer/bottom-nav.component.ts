@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { APP_ROLES } from '../../../models/auth.models';
 
 type NavItem = {
+  id: string;
   label: string;
   icon: string;
   link: string;
@@ -26,6 +27,7 @@ type NavItem = {
       <nav class="bottom-nav" aria-label="Primary navigation">
         <a
           *ngFor="let item of navItems"
+          [id]="item.id"
           [routerLink]="item.link"
           routerLinkActive="active"
           [routerLinkActiveOptions]="item.exact === false ? { exact: false } : { exact: true }"
@@ -123,7 +125,8 @@ export class BottomNavComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly router: Router,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -145,12 +148,11 @@ export class BottomNavComponent implements OnInit, OnDestroy {
   }
 
   private refreshState(url: string): void {
-    this.isVisible = this.authService.isLoggedIn() && !this.isAuthPage(url);
-    this.navItems = this.isVisible ? this.getNavItemsForRole() : [];
-  }
-
-  private isAuthPage(url: string): boolean {
-    return url === '/login' || url === '/register';
+    this.navItems = this.authService.isLoggedIn()
+      ? this.getNavItemsForRole()
+      : this.getPublicNavItems(url);
+    this.isVisible = this.navItems.length > 0;
+    this.cdr.markForCheck();
   }
 
   private getNavItemsForRole(): NavItem[] {
@@ -159,28 +161,46 @@ export class BottomNavComponent implements OnInit, OnDestroy {
     switch (role) {
       case APP_ROLES.admin:
         return [
-          { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
-          { label: 'Operations', icon: 'tune', link: '/admin/operations' },
-          { label: 'Vendors', icon: 'storefront', link: '/admin/vendors' },
-          { label: 'Menu', icon: 'restaurant_menu', link: '/menu/manage' },
-          { label: 'Profile', icon: 'account_circle', link: '/profile' },
+          { id: 'bottom-nav-dashboard-link', label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
+          { id: 'bottom-nav-operations-link', label: 'Operations', icon: 'tune', link: '/admin/operations' },
+          { id: 'bottom-nav-vendors-link', label: 'Vendors', icon: 'storefront', link: '/admin/vendors' },
+          { id: 'bottom-nav-menu-manage-link', label: 'Menu', icon: 'restaurant_menu', link: '/menu/manage' },
+          { id: 'bottom-nav-profile-link', label: 'Profile', icon: 'account_circle', link: '/profile' },
         ];
       case APP_ROLES.vendor:
         return [
-          { label: 'Orders', icon: 'room_service', link: '/vendor/orders' },
-          { label: 'Manage', icon: 'edit_note', link: '/menu/manage' },
-          { label: 'Scanner', icon: 'qr_code_scanner', link: '/vendor/scanner' },
-          { label: 'Queue', icon: 'groups', link: '/vendor/queue' },
-          { label: 'Profile', icon: 'account_circle', link: '/profile' },
+          { id: 'bottom-nav-vendor-orders-link', label: 'Orders', icon: 'room_service', link: '/vendor/orders' },
+          { id: 'bottom-nav-vendor-manage-link', label: 'Manage', icon: 'edit_note', link: '/menu/manage' },
+          { id: 'bottom-nav-vendor-scanner-link', label: 'Scanner', icon: 'qr_code_scanner', link: '/vendor/scanner' },
+          { id: 'bottom-nav-vendor-queue-link', label: 'Queue', icon: 'groups', link: '/vendor/queue' },
+          { id: 'bottom-nav-vendor-profile-link', label: 'Profile', icon: 'account_circle', link: '/profile' },
         ];
       default:
         return [
-          { label: 'Menu', icon: 'restaurant_menu', link: '/menu' },
-          { label: 'Cart', icon: 'shopping_cart', link: '/cart' },
-          { label: 'Orders', icon: 'receipt_long', link: '/orders', exact: false },
-          { label: 'Wallet', icon: 'account_balance_wallet', link: '/wallet' },
-          { label: 'Profile', icon: 'account_circle', link: '/profile' },
+          { id: 'bottom-nav-menu-link', label: 'Menu', icon: 'restaurant_menu', link: '/menu' },
+          { id: 'bottom-nav-cart-link', label: 'Cart', icon: 'shopping_cart', link: '/cart' },
+          { id: 'bottom-nav-orders-link', label: 'Orders', icon: 'receipt_long', link: '/orders', exact: false },
+          { id: 'bottom-nav-wallet-link', label: 'Wallet', icon: 'account_balance_wallet', link: '/wallet' },
+          { id: 'bottom-nav-profile-link', label: 'Profile', icon: 'account_circle', link: '/profile' },
         ];
     }
+  }
+
+  private getPublicNavItems(url: string): NavItem[] {
+    return [
+      {
+        id: 'bottom-nav-login-link',
+        label: 'Login',
+        icon: 'login',
+        link: '/login',
+        exact: url !== '/register',
+      },
+      {
+        id: 'bottom-nav-register-link',
+        label: 'Register',
+        icon: 'person_add',
+        link: '/register',
+      },
+    ];
   }
 }
