@@ -111,8 +111,20 @@
           <button id="menu-manage-item-edit-btn-{{ i + 1 }}" class="btn-icon btn-secondary" type="button" [disabled]="!canEditItem(item)" (click)="openEditForm(item)" title="Edit">
             <span class="material-symbols-outlined">edit</span>
           </button>
-          <button id="menu-manage-item-toggle-btn-{{ i + 1 }}" class="btn-icon btn-toggle" type="button" [disabled]="!canEditItem(item)" (click)="toggleAvailability(item)" title="Toggle Availability">
-            <span class="material-symbols-outlined">{{ item.isAvailable ? 'check' : 'close' }}</span>
+          <button
+            id="menu-manage-item-toggle-btn-{{ i + 1 }}"
+            class="availability-toggle"
+            type="button"
+            [class.is-on]="item.isAvailable"
+            [attr.aria-pressed]="item.isAvailable"
+            [disabled]="!canEditItem(item)"
+            (click)="toggleAvailability(item)"
+            [title]="item.isAvailable ? 'Mark unavailable' : 'Mark available'"
+          >
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">{{ item.isAvailable ? 'Available' : 'Unavailable' }}</span>
           </button>
           <button id="menu-manage-item-delete-btn-{{ i + 1 }}" class="btn-icon btn-danger" type="button" [disabled]="!canDeleteItem(item)" (click)="deleteItem(item)" [title]="canDeleteItem(item) ? 'Delete' : 'Only admins can delete items'">
             <span class="material-symbols-outlined">delete</span>

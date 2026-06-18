@@ -65,6 +65,7 @@
         id="checkout-step-tab-{{ i + 1 }}"
         [class.active]="activeStep === i"
         [class.done]="activeStep > i"
+        [disabled]="i > 0 && !selectedPickupSlot"
         (click)="goToStep(i)"
         type="button"
       >
@@ -212,6 +213,7 @@
             id="checkout-card-next-step-btn"
             class="nav-btn primary"
             (click)="nextStep()"
+            [disabled]="activeStep === 0 && !selectedPickupSlot"
             type="button"
           >
             Next

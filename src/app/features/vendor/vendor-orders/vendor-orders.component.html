@@ -54,8 +54,8 @@
             <h3 id="vendor-order-item-name-{{ i + 1 }}">{{ order.itemName }}</h3>
             <p id="vendor-order-pickup-slot-{{ i + 1 }}">Pickup {{ order.pickupSlot || 'slot pending' }}</p>
           </div>
-          <span id="vendor-order-status-{{ i + 1 }}" class="status-badge" [ngClass]="getStatusClass(order.vendorStatus)">
-            {{ order.vendorStatus }}
+          <span id="vendor-order-status-{{ i + 1 }}" class="status-badge" [ngClass]="getStatusClass(getDisplayStatus(order))">
+            {{ getDisplayStatus(order) }}
           </span>
         </div>
 

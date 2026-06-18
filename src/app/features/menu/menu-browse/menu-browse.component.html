@@ -54,8 +54,10 @@
           type="text"
           class="search-input"
           placeholder="   Search dishes..."
+          [value]="searchTerm"
           (input)="onSearch($event)"
         />
+        <span id="menu-search-status" class="search-status" *ngIf="isSearching">Searching...</span>
       </div>
 
       <div class="filters">

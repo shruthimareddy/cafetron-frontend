@@ -259,6 +259,10 @@
   padding: 20px;
 }
 
+.qr-section-disabled {
+  opacity: 0.78;
+}
+
 .qr-section h2 {
   margin: 0 0 16px;
   color: var(--text);
@@ -280,6 +284,25 @@
   font-size: 14px;
   font-weight: 800;
   text-align: center;
+}
+
+.qr-disabled-message {
+  display: grid;
+  gap: 10px;
+  place-items: center;
+  min-height: 130px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.qr-disabled-message .material-symbols-outlined {
+  color: var(--danger);
+  font-size: 44px;
+}
+
+.qr-disabled-message p {
+  margin: 0;
+  font-weight: 800;
 }
 
 .qr-token {
@@ -309,6 +332,15 @@
 .qr-view-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(249, 115, 22, 0.28);
+}
+
+.qr-view-btn-disabled,
+.qr-view-btn-disabled:hover {
+  transform: none;
+  background: var(--surface-soft);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .qr-view-btn .material-symbols-outlined {

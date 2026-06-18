@@ -231,6 +231,14 @@
   color: rgba(255, 255, 255, 0.66);
 }
 
+.search-status {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;

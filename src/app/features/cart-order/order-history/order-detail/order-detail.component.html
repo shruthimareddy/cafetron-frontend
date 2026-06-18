@@ -68,22 +68,54 @@
       </section>
 
       <!-- QR Code Section -->
-      <div id="order-detail-qr-section" *ngIf="order.qrToken" class="section qr-section">
+      <div
+        id="order-detail-qr-section"
+        *ngIf="order.qrToken"
+        class="section qr-section"
+        [class.qr-section-disabled]="isOrderClosed()"
+      >
         <h2 class="section-title">📲 Pickup QR Code</h2>
-        <div class="qr-content">
+        <div class="qr-content" *ngIf="!isOrderClosed(); else disabledQr">
           <p class="qr-description">Show this QR code at pickup</p>
           <!-- <div class="qr-token">{{ order.qrToken }}</div> -->
            <div id="order-detail-qr-token" class="qr-token"><order-qr-display id="order-detail-qr-display" [orderId]="order.orderId" /></div>
         </div>
+        <ng-template #disabledQr>
+          <div id="order-detail-qr-disabled-message" class="qr-disabled-message">
+            <span class="material-symbols-outlined">block</span>
+            <p>Pickup QR is disabled because this order is cancelled.</p>
+          </div>
+        </ng-template>
         <!-- <code>{{ order.qrToken }}</code> -->
-        <a id="order-detail-qr-view-link" class="qr-view-btn" [routerLink]="['/pickup/qr', order.orderId]">
+        <a
+          id="order-detail-qr-view-link"
+          *ngIf="!isOrderClosed()"
+          class="qr-view-btn"
+          [routerLink]="['/pickup/qr', order.orderId]"
+        >
           <span class="material-symbols-outlined">qr_code_2</span>
           View Pickup QR
         </a>
+        <button
+          id="order-detail-qr-view-disabled-btn"
+          *ngIf="isOrderClosed()"
+          class="qr-view-btn qr-view-btn-disabled"
+          type="button"
+          disabled
+        >
+          <span class="material-symbols-outlined">qr_code_2</span>
+          Pickup QR Disabled
+        </button>
       </div>
 
-      <button id="order-detail-timeout-btn" class="timeout-btn" (click)="onProcessTimeout()" [disabled]="isProcessingTimeout" type="button">
-        {{ isProcessingTimeout ? 'Processing...' : 'Request Timeout' }}
+      <button
+        id="order-detail-timeout-btn"
+        class="timeout-btn"
+        (click)="onProcessTimeout()"
+        [disabled]="isProcessingTimeout || isOrderClosed()"
+        type="button"
+      >
+        {{ getTimeoutButtonLabel() }}
       </button>
     </ng-container>
   </section>

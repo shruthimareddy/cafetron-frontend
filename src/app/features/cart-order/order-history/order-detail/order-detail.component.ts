@@ -78,7 +78,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   onProcessTimeout(): void {
-    if (!this.order) return;
+    if (!this.order || this.isOrderClosed()) return;
 
     if (!confirm('Are you sure you want to request a timeout for this order?')) {
       return;
@@ -94,18 +94,44 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
         next: (updatedOrder) => {
           this.order = updatedOrder;
           this.isProcessingTimeout = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('❌ Error processing timeout:', error);
           this.errorMessage =
             error.error?.message || 'Failed to process timeout. Please try again.';
           this.isProcessingTimeout = false;
+          this.cdr.markForCheck();
         },
       });
   }
 
   goBack(): void {
     this.router.navigate(['/orders']);
+  }
+
+  isOrderClosed(): boolean {
+    if (!this.order) {
+      return true;
+    }
+
+    const orderStatus = this.order.overallStatus?.toUpperCase();
+    const paymentStatus = this.order.paymentStatus?.toUpperCase();
+
+    return (
+      orderStatus === 'CANCELLED' ||
+      orderStatus === 'TIMEOUT' ||
+      orderStatus === 'VENDOR_DECLINED' ||
+      paymentStatus === 'REFUNDED'
+    );
+  }
+
+  getTimeoutButtonLabel(): string {
+    if (this.isProcessingTimeout) {
+      return 'Processing...';
+    }
+
+    return this.isOrderClosed() ? 'Order Cancelled' : 'Request Timeout';
   }
 
   getStatusColor(status: string): string {

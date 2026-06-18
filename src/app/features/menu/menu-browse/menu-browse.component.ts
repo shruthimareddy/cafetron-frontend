@@ -21,8 +21,10 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   activeFilter = 'ALL';
   isLoading = true;
+  isSearching = false;
   errorMessage = '';
   cartMessage = '';
+  searchTerm = '';
   cartItems: CartItem[] = [];
   cartItemCount = 0;
   cartTotal = 0;
@@ -30,6 +32,7 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
   userName = '';
 
   private cartMessageTimeout: ReturnType<typeof setTimeout> | null = null;
+  private menuRequestId = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -117,9 +120,11 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  loadToday(): void {
+  loadToday(showPageLoader = true): void {
+    const requestId = ++this.menuRequestId;
     this.activeFilter = 'ALL';
-    this.isLoading = true;
+    this.isLoading = showPageLoader;
+    this.isSearching = !showPageLoader;
     this.errorMessage = '';
 
     this.menuService
@@ -130,11 +135,20 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (data) => {
+          if (requestId !== this.menuRequestId) {
+            return;
+          }
+
           this.items = this.normalizeItems(data);
           this.isLoading = false;
+          this.isSearching = false;
           this.cdr.detectChanges();
         },
         error: (error) => {
+          if (requestId !== this.menuRequestId) {
+            return;
+          }
+
           console.error('Error loading menu:', error);
           this.items = [];
           this.errorMessage =
@@ -142,6 +156,7 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
               ? 'Menu took too long to load. Please check that the backend is running.'
               : error.error?.message || 'Failed to load menu. Please try again.';
           this.isLoading = false;
+          this.isSearching = false;
           this.cdr.detectChanges();
         },
       });
@@ -149,7 +164,11 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
 
   onSearch(event: Event): void {
     const term = (event.target as HTMLInputElement).value;
-    this.isLoading = true;
+    const requestId = ++this.menuRequestId;
+
+    this.searchTerm = term;
+    this.activeFilter = 'ALL';
+    this.isSearching = true;
     this.errorMessage = '';
 
     if (term.trim()) {
@@ -161,26 +180,38 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (data) => {
+            if (requestId !== this.menuRequestId) {
+              return;
+            }
+
             this.items = this.normalizeItems(data);
-            this.isLoading = false;
+            this.isSearching = false;
             this.cdr.detectChanges();
           },
           error: (error) => {
+            if (requestId !== this.menuRequestId) {
+              return;
+            }
+
             console.error('Search error:', error);
             this.items = [];
             this.errorMessage = 'Failed to search menu items.';
-            this.isLoading = false;
+            this.isSearching = false;
             this.cdr.detectChanges();
           },
         });
     } else {
-      this.loadToday();
+      this.loadToday(false);
     }
   }
 
   applyFilter(type: string): void {
+    const requestId = ++this.menuRequestId;
+
+    this.searchTerm = '';
     this.activeFilter = type;
     this.isLoading = true;
+    this.isSearching = false;
     this.errorMessage = '';
 
     if (type === 'ALL') {
@@ -194,11 +225,19 @@ export class MenuBrowseComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (data) => {
+            if (requestId !== this.menuRequestId) {
+              return;
+            }
+
             this.items = this.normalizeItems(data);
             this.isLoading = false;
             this.cdr.detectChanges();
           },
           error: (error) => {
+            if (requestId !== this.menuRequestId) {
+              return;
+            }
+
             console.error('Filter error:', error);
             this.items = [];
             this.errorMessage = `Failed to filter by ${type}.`;

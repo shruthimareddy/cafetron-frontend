@@ -125,10 +125,20 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   goToStep(index: number): void {
+    if (index > 0 && !this.selectedPickupSlot) {
+      this.showToast('Please select a pickup time before continuing', 'error');
+      return;
+    }
+
     this.activeStep = Math.max(0, Math.min(index, this.checkoutSteps.length - 1));
   }
 
   nextStep(): void {
+    if (this.activeStep === 0 && !this.selectedPickupSlot) {
+      this.showToast('Please select a pickup time before continuing', 'error');
+      return;
+    }
+
     this.goToStep(this.activeStep + 1);
   }
 

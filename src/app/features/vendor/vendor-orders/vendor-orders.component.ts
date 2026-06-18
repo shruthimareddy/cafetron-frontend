@@ -78,7 +78,7 @@ export class VendorOrdersComponent implements OnInit, OnDestroy {
   }
 
   isPending(order: VendorOrder): boolean {
-    return order.vendorStatus === 'PENDING';
+    return order.vendorStatus === 'PENDING' && !this.isOrderCancelled(order);
   }
 
   getStatusClass(status: string): string {
@@ -89,9 +89,19 @@ export class VendorOrdersComponent implements OnInit, OnDestroy {
         return 'status-declined';
       case 'TIMEOUT':
         return 'status-timeout';
+      case 'CANCELLED':
+        return 'status-cancelled';
       default:
         return 'status-pending';
     }
+  }
+
+  getDisplayStatus(order: VendorOrder): string {
+    return this.isOrderCancelled(order) ? 'CANCELLED' : order.vendorStatus;
+  }
+
+  private isOrderCancelled(order: VendorOrder): boolean {
+    return order.orderStatus === 'CANCELLED' || order.vendorStatus === 'CANCELLED';
   }
 
   private afterAction(message: string, isError = false): void {
