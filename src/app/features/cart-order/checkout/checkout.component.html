@@ -65,7 +65,8 @@
         id="checkout-step-tab-{{ i + 1 }}"
         [class.active]="activeStep === i"
         [class.done]="activeStep > i"
-        [disabled]="i > 0 && !isPickupSlotAvailable(selectedPickupSlot)"
+        [class.step-locked]="i > 0 && !isPickupSlotAvailable(selectedPickupSlot)"
+        [attr.aria-disabled]="i > 0 && !isPickupSlotAvailable(selectedPickupSlot)"
         (click)="goToStep(i)"
         type="button"
       >
@@ -121,7 +122,7 @@
               class="time-slot"
               [class.selected]="selectedPickupSlot === slot"
               [class.unavailable]="!isPickupSlotAvailable(slot)"
-              [disabled]="!isPickupSlotAvailable(slot)"
+              [attr.aria-disabled]="!isPickupSlotAvailable(slot)"
               (click)="selectPickupSlot(slot)"
               type="button"
             >
@@ -218,7 +219,7 @@
             id="checkout-card-place-order-btn"
             class="place-btn"
             (click)="onPlaceOrder()"
-            [disabled]="isLoading || cartItems.length === 0 || !isPickupSlotAvailable(selectedPickupSlot)"
+            [disabled]="isLoading || cartItems.length === 0"
             type="button"
           >
             <span>{{ isLoading ? 'Placing Order...' : 'Place Order' }}</span>
@@ -243,7 +244,6 @@
             id="checkout-card-next-step-btn"
             class="nav-btn primary"
             (click)="nextStep()"
-            [disabled]="activeStep === 0 && !isPickupSlotAvailable(selectedPickupSlot)"
             type="button"
           >
             Next
@@ -293,7 +293,7 @@
             class="time-slot"
             [class.selected]="selectedPickupSlot === slot"
             [class.unavailable]="!isPickupSlotAvailable(slot)"
-            [disabled]="!isPickupSlotAvailable(slot)"
+            [attr.aria-disabled]="!isPickupSlotAvailable(slot)"
             (click)="selectPickupSlot(slot)"
             type="button"
           >
@@ -382,7 +382,7 @@
           id="checkout-overview-place-order-btn"
           class="place-btn"
           (click)="onPlaceOrder()"
-          [disabled]="isLoading || cartItems.length === 0 || !isPickupSlotAvailable(selectedPickupSlot)"
+          [disabled]="isLoading || cartItems.length === 0"
           type="button"
         >
           <span>{{ isLoading ? 'Placing Order...' : 'Place Order' }}</span>

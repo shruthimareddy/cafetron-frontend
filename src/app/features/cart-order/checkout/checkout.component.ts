@@ -35,6 +35,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   activeStep = 0;
   private destroy$ = new Subject<void>();
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private slotAvailabilityTimerId: ReturnType<typeof setInterval> | null = null;
   private readonly cafeteriaTimeZone = 'Asia/Kolkata';
   private readonly minPickupLeadMinutes = 30;
   private readonly timezoneStorageKey = 'cafetron_timezone';
@@ -100,6 +101,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       });
 
     this.loadWalletBalance();
+    this.slotAvailabilityTimerId = setInterval(() => {
+      if (this.selectedPickupSlot && !this.isPickupSlotAvailable(this.selectedPickupSlot)) {
+        this.selectedPickupSlot = '';
+        this.showToast(`Selected pickup time expired. Choose a slot at least ${this.minPickupLeadMinutes} minutes from now.`, 'error');
+      }
+    }, 30000);
   }
 
   private calculateTotal(): void {
@@ -179,7 +186,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   selectPickupSlot(slot: string): void {
     if (!this.isPickupSlotAvailable(slot)) {
-      this.showToast(`Pickup time must be at least ${this.minPickupLeadMinutes} minutes from now`, 'error');
+      this.showToast(this.getInvalidPickupSlotMessage(slot), 'error');
       return;
     }
 
@@ -196,7 +203,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   goToStep(index: number): void {
     if (index > 0 && !this.hasValidPickupSlotSelected()) {
-      this.showToast('Please select a pickup time before continuing', 'error');
+      this.showToast(this.getPickupSlotRequiredMessage(), 'error');
       return;
     }
 
@@ -205,7 +212,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   nextStep(): void {
     if (this.activeStep === 0 && !this.hasValidPickupSlotSelected()) {
-      this.showToast('Please select a pickup time before continuing', 'error');
+      this.showToast(this.getPickupSlotRequiredMessage(), 'error');
       return;
     }
 
@@ -218,12 +225,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   onPlaceOrder(): void {
     if (!this.hasValidPickupSlotSelected()) {
-      this.showToast(`Please select a pickup time at least ${this.minPickupLeadMinutes} minutes from now`, 'error');
+      this.showToast(this.getPickupSlotRequiredMessage(), 'error');
       return;
     }
 
     if (this.cartItems.length === 0) {
       this.showToast('Your cart is empty', 'error');
+      return;
+    }
+
+    if (!this.pickupLocation.trim()) {
+      this.showToast('Please enter a pickup location', 'error');
       return;
     }
 
@@ -350,6 +362,22 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return !!this.selectedPickupSlot && this.isPickupSlotAvailable(this.selectedPickupSlot);
   }
 
+  private getPickupSlotRequiredMessage(): string {
+    if (!this.selectedPickupSlot) {
+      return `Please select a pickup time at least ${this.minPickupLeadMinutes} minutes from now`;
+    }
+
+    return this.getInvalidPickupSlotMessage(this.selectedPickupSlot);
+  }
+
+  private getInvalidPickupSlotMessage(slot: string): string {
+    if (this.isPickupSlotPast(slot)) {
+      return 'That pickup time has already passed. Please choose a later slot.';
+    }
+
+    return `Pickup time must be at least ${this.minPickupLeadMinutes} minutes from now`;
+  }
+
   private getFirstAvailablePickupSlot(): string {
     return this.pickupSlots.find((slot) => this.isPickupSlotAvailable(slot)) || '';
   }
@@ -440,6 +468,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
+    }
+    if (this.slotAvailabilityTimerId) {
+      clearInterval(this.slotAvailabilityTimerId);
     }
     this.destroy$.next();
     this.destroy$.complete();
